@@ -203,7 +203,7 @@ export class WorldScene extends WarpableScene {
     };
   }
 
-  preload() {}
+  preload() { }
 
   create() {
     this.camera = this.cameras.main;
@@ -401,17 +401,17 @@ export class WorldScene extends WarpableScene {
     const spriteData =
       entity.Metadata?.SpriteTxId !== undefined
         ? {
-            sprite: entity.Metadata?.SpriteTxId,
-            atlas: entity.Metadata?.SpriteAtlasTxId,
-          }
+          sprite: entity.Metadata?.SpriteTxId,
+          atlas: entity.Metadata?.SpriteAtlasTxId,
+        }
         : isPlayer &&
-            this.worldState.parameters["2D-Tile-0"]?.PlayerSpriteTxId !==
-              undefined
+          this.worldState.parameters["2D-Tile-0"]?.PlayerSpriteTxId !==
+          undefined
           ? {
-              sprite: this.worldState.parameters["2D-Tile-0"]?.PlayerSpriteTxId,
-              atlas:
-                this.worldState.parameters["2D-Tile-0"]?.PlayerSpriteAtlasTxId,
-            }
+            sprite: this.worldState.parameters["2D-Tile-0"]?.PlayerSpriteTxId,
+            atlas:
+              this.worldState.parameters["2D-Tile-0"]?.PlayerSpriteAtlasTxId,
+          }
           : undefined;
 
     return spriteData !== undefined
@@ -752,10 +752,19 @@ export class WorldScene extends WarpableScene {
     spriteKeyBase: string,
   ) {
     const isBouncer = bouncerEntityIds.includes(entityId);
+
+    // List of animations to choose from
+    const animations = ['sludge'];//['emote', 'punch_up', 'punch_down', 'punch', 'sludge'];
+
     sprite.on(
       "pointerdown",
       () => {
-        this.playAni(sprite, spriteKeyBase, `emote`);
+        // Pick a random animation from the list
+        const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+
+        // Play the randomly selected animation
+        this.playAni(sprite, spriteKeyBase, randomAnimation);
+
         if (entity.Metadata?.Interaction?.Type === "Default") {
           this.aoContractClientForProcess(entityId).message({
             tags: [
@@ -766,8 +775,11 @@ export class WorldScene extends WarpableScene {
             ],
           });
         }
+
         setTimeout(() => {
+          // Revert to the idle animation after 1 second
           this.playAni(sprite, spriteKeyBase, `idle`);
+
           if (isBouncer) {
             this.showEntityChatMessages([
               {
@@ -785,6 +797,7 @@ export class WorldScene extends WarpableScene {
       this,
     );
   }
+
 
   createAvatarEntityContainer(
     entityId: string,
@@ -1021,9 +1034,8 @@ export class WorldScene extends WarpableScene {
       playerBody.setVelocityY(0);
     }
 
-    const direction = `${
-      isUp ? "up" : isDown ? "down" : ""
-    }${isDiagonal ? "_" : ""}${isLeft ? "left" : isRight ? "right" : ""}`;
+    const direction = `${isUp ? "up" : isDown ? "down" : ""
+      }${isDiagonal ? "_" : ""}${isLeft ? "left" : isRight ? "right" : ""}`;
     const isMoving = isLeft || isRight || isUp || isDown;
 
     const changeAni =
